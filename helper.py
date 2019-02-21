@@ -35,6 +35,16 @@ def beautify_tickers(tickers):
         
     return pretty_tickers
 
+def beautify_ticker(ticker):
+    ''' Takes individual Zipline formatted ticker and returns just the symbol'''
+    # Format is 'Equity(0, [TICK])' -- search for '[' and up to ']'
+    ticker = str(ticker)
+    start_idx = ticker.find('[') + 1
+    end_idx = ticker.find(']')        
+    return ticker[start_idx:end_idx]
+    
+    
+
 def build_pipeline_engine(bundle_data, trading_calendar):
     pricing_loader = PricingLoader(bundle_data)
 
