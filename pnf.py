@@ -81,7 +81,7 @@ def sum_buy_signals(row):
     on_buy_signal = list(filter(lambda x: x == 'buy', row))
     return len(on_buy_signal)
     
-def run_rs_matrix(symbols, historical_panel):
+def run_rs_matrix(historical_panel):
     '''
         This function will run a relative strength matrix for the symbols passed. 
         
@@ -90,19 +90,12 @@ def run_rs_matrix(symbols, historical_panel):
         
         return (pd.DataFrame) DataFrame representing an RS matrix
     '''
-    
-    # Start by ensuring that all tickers within symbols exist in historical df. If not, exclude symbol
-    valid_symbols = []
-    for symbol in symbols:
-        if symbol in historical_panel.items:
-            valid_symbols.append(symbol)
-            
-    if len(valid_symbols) >= 2:
+    if len(historical_panel.items) >= 2:
         # Create a blank matrix to hold the charts
-        col_matrix = pd.DataFrame(index=valid_symbols, columns=valid_symbols)
-        signal_matrix = pd.DataFrame(index=valid_symbols, columns=valid_symbols)
-        for numerator in valid_symbols:
-            for denominator in valid_symbols:
+        col_matrix = pd.DataFrame(index=historical_panel.items, columns=historical_panel.items)
+        signal_matrix = pd.DataFrame(index=historical_panel.items, columns=historical_panel.items)
+        for numerator in historical_panel.items:
+            for denominator in historical_panel.items:
                 # Create RS chart with every other chart
                 chart = generate_rs_chart(numerator, denominator, historical_panel)  
                 
@@ -116,7 +109,7 @@ def run_rs_matrix(symbols, historical_panel):
                 signal_matrix.at[numerator, denominator] = signal
                 
         # Null out the diagonal of matrices, as this is RS versus itself
-        for symbol in valid_symbols:
+        for symbol in historical_panel.items:
             col_matrix.at[symbol, symbol] = None
             signal_matrix.at[symbol, symbol] = None
             
@@ -125,9 +118,9 @@ def run_rs_matrix(symbols, historical_panel):
         signal_matrix['buy_count'] = signal_matrix.apply(sum_buy_signals, axis=1)
         
         # Combine matrices together
-        columns = ['x_count', 'buy_count', 'total'] + valid_symbols
-        rs_matrix = pd.DataFrame(index = valid_symbols, columns=columns)
-        for symbol in valid_symbols:
+        columns = ['x_count', 'buy_count', 'total'] + list(historical_panel.items)
+        rs_matrix = pd.DataFrame(index = historical_panel.items, columns=columns)
+        for symbol in historical_panel.items:
             rs_matrix[symbol] = col_matrix[symbol] + '_' + signal_matrix[symbol]
         rs_matrix['x_count'] = col_matrix['x_count']
         rs_matrix['buy_count'] = signal_matrix['buy_count']
