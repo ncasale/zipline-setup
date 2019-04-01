@@ -86,6 +86,8 @@ def get_sector_etf_panel():
         'XLU': 'Utilities',
         'XLF': 'Financials',
         'XLV': 'Healthcare',
+        #'RSP': 'SP 500 EW',
+        #'SPY': 'SP 500',
         #'XLRE': 'Real Estate',
         #'XLC': 'Communications'
     }
